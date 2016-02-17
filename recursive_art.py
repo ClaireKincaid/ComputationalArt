@@ -1,8 +1,10 @@
-""" TODO: Put your header comment here """
+""" Computational Art Project"""
+#Claire Kincaid
+#February 17 2016
 
-import random
+from random import *
 from PIL import Image
-
+from math import *
 
 def build_random_function(min_depth, max_depth):
     """ Builds a random function of depth at least min_depth and depth
@@ -14,9 +16,29 @@ def build_random_function(min_depth, max_depth):
         returns: the randomly generated function represented as a nested list
                  (see assignment writeup for details on the representation of
                  these functions)
+	#you can't write doctests for this... but I tested it and it works
     """
-    # TODO: implement this
-    pass
+    depth = max_depth
+    if min_depth == 0:
+        depth = randint(0, max_depth)
+    if depth == 0:
+        if randint (1,2) == 1:
+            return ["x"]
+        else:
+            return ["y"]
+    i = randint(1, 6)
+    if i == 1:
+        return ["prod", build_random_function(min_depth - 1, max_depth - 1), build_random_function(min_depth - 1, max_depth -1)]
+    if i == 2:
+        return ["avg", build_random_function(min_depth - 1, max_depth - 1), build_random_function(min_depth - 1, max_depth - 1)]
+    if i == 3:
+        return ["cos_pi", build_random_function(min_depth - 1, max_depth - 1)]
+    if i == 4:
+        return ["sin_pi", build_random_function(min_depth - 1, max_depth - 1)]
+    if i == 5:
+        return ["cube_x", build_random_function(min_depth - 1, max_depth - 1)]
+    if i == 6:
+        return ["square_x", build_random_function(min_depth - 1, max_depth - 1)]
 
 
 def evaluate_random_function(f, x, y):
@@ -27,15 +49,30 @@ def evaluate_random_function(f, x, y):
         x: the value of x to be used to evaluate the function
         y: the value of y to be used to evaluate the function
         returns: the function value
-
-        >>> evaluate_random_function(["x"],-0.5, 0.75)
-        -0.5
-        >>> evaluate_random_function(["y"],0.1,0.02)
-        0.02
+        -I don't have any time to add more doctests but I've run this a ridiculous 
+        amount of times while I was debugging.  It works. Trust me.  
+        And the six people that I bothered to help me.       
+    >>> evaluate_random_function(['x'], 1., 1.)
+    1.0
+    >>> evaluate_random_function(['y'], 1., 1.)
+    1.0
     """
-    # TODO: implement this
-    pass
-
+    if f[0] == "x":
+        return x
+    if f[0] == "y":
+        return y
+    if f[0] == "prod":
+        return evaluate_random_function(f[1], x, y)*evaluate_random_function(f[2], x, y)
+    if f[0] == "avg":
+        return 0.5*(evaluate_random_function(f[1], x, y)+evaluate_random_function(f[2], x, y))
+    if f[0] == "cos_pi":
+        return cos(pi*(evaluate_random_function(f[1], x, y)))
+    if f[0] == "sin_pi":
+        return sin(pi*(evaluate_random_function(f[1], x, y)))
+    if f[0] == "cube_x":
+        return (evaluate_random_function(f[1], x, y))**3
+    if f[0] == "square_x":
+        return (evaluate_random_function(f[1], x, y))**2
 
 def remap_interval(val,
                    input_interval_start,
@@ -64,8 +101,10 @@ def remap_interval(val,
         >>> remap_interval(5, 4, 6, 1, 2)
         1.5
     """
-    # TODO: implement this
-    pass
+    input_span = input_interval_end - input_interval_start
+    output_span = output_interval_end - output_interval_start
+    valScaled = float(val - input_interval_start) / float(input_span)
+    return output_interval_start + (valScaled * output_span)
 
 
 def color_map(val):
@@ -116,9 +155,9 @@ def generate_art(filename, x_size=350, y_size=350):
         x_size, y_size: optional args to set image dimensions (default: 350)
     """
     # Functions for red, green, and blue channels - where the magic happens!
-    red_function = ["x"]
-    green_function = ["y"]
-    blue_function = ["x"]
+    red_function = build_random_function(7,11)
+    green_function = build_random_function(7,9)
+    blue_function = build_random_function(7,9)
 
     # Create image and loop over all pixels
     im = Image.new("RGB", (x_size, y_size))
@@ -140,11 +179,5 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod()
 
-    # Create some computational art!
-    # TODO: Un-comment the generate_art function call after you
-    #       implement remap_interval and evaluate_random_function
-    # generate_art("myart.png")
-
-    # Test that PIL is installed correctly
-    # TODO: Comment or remove this function call after testing PIL install
-    test_image("noise.png")
+# Create some computational art!
+generate_art("myart.png")
